@@ -12,7 +12,7 @@ on:
     branches:
       - master
     paths:
-      - "newifi-3.config"
+      - "newifi-d2.config"
     schedule:
       - cron: 0 8 * * 5
   watch:
@@ -53,7 +53,7 @@ jobs:
 
       - name: Load custom configuration
         env:
-          CONFIG_FILE: "newifi-3.config"
+          CONFIG_FILE: "newifi-d2.config"
           DIY_SH: "diy.sh"
         run: |
           [ -e files ] && mv files openwrt/files
