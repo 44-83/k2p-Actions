@@ -14,7 +14,7 @@ on:
     paths:
       - "K22P.config"
     schedule:
-      - cron: 0 8 * * 5
+      - cron: 0 8 * * *
   watch:
     types: [started]
 
