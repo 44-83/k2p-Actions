@@ -1,0 +1,45 @@
+name: Padavan CI Build
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout - clone repository
+      uses: actions/checkout@v1
+    - name: Install - system build dependencies
+      run: |
+        sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd cpio git python-docutils automake autopoint texinfo build-essential help2man libltdl-dev gettext pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev
+    - name: Download - padavan source clone
+      run: |
+        sudo git clone https://github.com/hanwckf/rt-n56u.git /opt/rt-n56u
+    - name: Download - build tool chain
+      run: |
+        cd /opt/rt-n56u/toolchain-mipsel/
+        sudo ./clean_toolchain
+        sudo mkdir -p toolchain-3.4.x
+        sudo wget https://github.com/hanwckf/padavan-toolchain/releases/download/v1.1/mipsel-linux-uclibc.tar.xz
+        sudo tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
+    - name: Remove - delete all config
+      run: |
+        cd /opt/rt-n56u/trunk/configs/templates/
+        sudo rm *
+    - name: Config - download k2p config
+      run: |
+        cd /opt/rt-n56u/trunk/configs/templates/
+        sudo wget https://raw.githubusercontent.com/thisdk/thisdk.github.io/master/K2P_nano-5.0.config
+    - name: Build - make padavan source
+      run: |
+        cd /opt/rt-n56u/trunk/
+        sudo ./clear_tree
+        sudo ./build_firmware_modify K2P_nano-5.0
+    - name: Copy - copy image trx
+      run: |
+        cd /opt/rt-n56u/trunk/images/
+        sudo mkdir trx
+        sudo cp *.trx trx/
+        sudo md5sum trx/* > trx/md5sum
+    - name: Upload - push to artifact file
+      uses: actions/upload-artifact@v1
+      with:
+        name: k2p-padavan-image
+        path: /opt/rt-n56u/trunk/images/trx/
